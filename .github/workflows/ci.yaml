@@ -26,8 +26,7 @@ jobs:
       - name: Lint Nix code
         run: nix develop --impure -c alejandra -c .
       - name: Lint Go code
-        # TODO
-        run: echo "TODO"
+        run: nix develop --impure -c golangci-lint run ./...
   build:
     name: Build
     strategy:
@@ -40,5 +39,5 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
       - name: Build
-        run: nix build .#portfolio
+        run: nix build .#mona
 ...
