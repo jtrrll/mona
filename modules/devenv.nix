@@ -39,8 +39,9 @@
 
         packages =
           [
-            pkgs.commitizen
             inputs.gomod2nix.legacyPackages.${system}.gomod2nix
+            pkgs.commitizen
+            pkgs.golangci-lint
           ]
           ++ monaBuildInputs;
 
@@ -62,6 +63,9 @@
             };
             end-of-file-fixer.enable = true;
             flake-checker.enable = true;
+            gofmt.enable = true;
+            golangci-lint.enable = true;
+            govet.enable = true;
             markdownlint.enable = true;
             mixed-line-endings.enable = true;
             nil.enable = true;
@@ -76,6 +80,45 @@
             shellcheck.enable = true;
             shfmt.enable = true;
             statix.enable = true;
+          };
+        };
+
+        scripts = {
+          build = {
+            description = "Builds the project binary.";
+            exec = ''
+              ${pkgs.gum}/bin/gum spin --show-error --spinner line --title "gomod2nix" -- gomod2nix
+              nix build .#mona
+            '';
+          };
+          demo = {
+            description = "Generates a demo GIF.";
+            exec = ''
+              ${pkgs.uutils-coreutils-noprefix}/bin/printf "TODO\n"
+            '';
+          };
+          lint = {
+            description = "Lints the project.";
+            exec = ''
+              ${pkgs.gum}/bin/gum spin --show-error --spinner line --title "alejandra ." -- alejandra .
+              ${pkgs.gum}/bin/gum spin --show-error --spinner line --title "go mod tidy" -- go mod tidy
+              ${pkgs.gum}/bin/gum spin --show-error --spinner line --title "go fmt" -- go fmt ./...
+              ${pkgs.gum}/bin/gum spin --show-error --spinner line --title "go vet" -- go vet ./...
+              ${pkgs.gum}/bin/gum spin --show-error --spinner line --title "golangci-lint" -- golangci-lint run ./...
+            '';
+          };
+          run = {
+            description = "Runs the project.";
+            exec = ''
+              ${pkgs.gum}/bin/gum spin --show-error --spinner line --title "gomod2nix" -- gomod2nix
+              nix run .#mona
+            '';
+          };
+          test = {
+            description = "Runs all unit tests.";
+            exec = ''
+              ${pkgs.gum}/bin/gum spin --show-error --spinner line --title "go test" -- go test ./...
+            '';
           };
         };
       };
